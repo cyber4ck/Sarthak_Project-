@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Indian Recipe Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fffefd;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #d35400;
+    }
+    input {
+      padding: 10px;
+      width: 250px;
+      border: 2px solid #d35400;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #d35400;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #e67e22;
+    }
+    .recipe {
+      margin: 20px auto;
+      max-width: 600px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+      text-align: left;
+    }
+    .recipe img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .recipe h2 {
+      margin: 10px 0;
+      color: #333;
+    }
+    .recipe p {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sarth Recipe Finder</h1>
+  <p>Search for your favorite Indian dish</p>
+  <input type="text" id="search" placeholder="e.g. Biryani, Paneer, Chicken">
+  <button onclick="getRecipe()">Search</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function getRecipe() {
+      const query = document.getElementById("search").value.trim();
+      if (query === "") {
+        alert("Please enter a dish name!");
+        return;
+      }
+
+      // Using TheMealDB API (free and public)
+      const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "";
+
+        if (data.meals) {
+          data.meals.forEach(meal => {
+            const div = document.createElement("div");
+            div.className = "recipe";
+            div.innerHTML = `
+              <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+              <h2>${meal.strMeal}</h2>
+              <p><b>Category:</b> ${meal.strCategory}</p>
+              <p><b>Area:</b> ${meal.strArea}</p>
+              <p><b>Instructions:</b> ${meal.strInstructions.substring(0, 200)}...</p>
+              <a href="${meal.strYoutube}" target="_blank">▶ Watch on YouTube</a>
+            `;
+            resultDiv.appendChild(div);
+          });
+        } else {
+          resultDiv.innerHTML = "<p>No recipe found. Try another dish!</p>";
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error fetching recipe. Please try again.");
+      }
+    }
+  </script>
+</body>
+</html>
